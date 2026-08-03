@@ -1,0 +1,6 @@
+if you were going to write a fairly simple python program to predict power outages for a town, what would it look like? Assume you have access to the following online tables of data: 
+1) Current and past temperature, precipitation and wind with time and date stamps 
+2) Past power outages with duration. Also time and date stamped 
+3) Current time and date. 
+4) Forecast temperature, precipitation and wind out to ten days 
+5) Current and past load on the grid with time and date stamps.

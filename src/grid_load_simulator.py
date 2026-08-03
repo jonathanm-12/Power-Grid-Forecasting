@@ -1,0 +1,216 @@
+#!/usr/bin/env python3
+"""
+Live Power Grid Load. Hoboken, NJ
+
+Current live electrical load on the power grid (as a percentage of capacity)
+based on time of day, weekday vs weekend, season, and temperature.
+
+Location: Hoboken, New Jersey (New York metro climate)
+
+Output:
+  - live_grid_load.csv  (most recent reading at top)
+  - Updates every 10 seconds
+
+Load ranges from 25% to 85%:
+  Highest: 5–7 pm weekdays and 12–7 pm weekends in summer (AC-driven)
+  Lowest:  late night in winter
+
+"""
+
+from __future__ import annotations
+
+import csv
+import math
+import random
+import time
+from collections import deque
+from datetime import datetime
+from pathlib import Path
+from typing import Deque, Tuple
+
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+LIVE_CSV_FILE = PROJECT_ROOT / "data" / "generated" / "live_grid_load.csv"
+
+UPDATE_INTERVAL_SEC = 10
+HISTORY_LENGTH = 1000                #~2.8 hours of history
+
+
+def day_type_label(dt: datetime) -> str:
+    if dt.weekday() >= 5:       #Saturday or Sunday
+        return "Weekend"
+    return "Weekday"
+
+
+def get_season(month: int) -> str:
+    if month in (6, 7, 8):
+        return "Summer"
+    if month in (12, 1, 2):
+        return "Winter"
+    if month in (3, 4, 5):
+        return "Spring"
+    return "Autumn"
+
+#Temperature simulation – NYC metro climate
+
+def simulate_temperature(dt: datetime) -> float:
+    """
+    Synthetic temperature (°C) roughly matching Hoboken, NJ.
+    - Summer highs often 28–33°C (sometimes higher)
+    - Winter averages near freezing, with cold snaps below -5°C
+    """
+    day_of_year = dt.timetuple().tm_yday
+
+    # Seasonal curve: peak in late July, trough in mid-January
+    # Mean ≈ 13°C, amplitude ≈ 16°C  → summer ~29°C, winter ~-3°C
+    seasonal = 13.0 + 16.0 * math.sin(2.0 * math.pi * (day_of_year - 100) / 365.0)
+
+    hour = dt.hour + dt.minute / 60.0
+
+    #Daytime is longer in summer
+    if get_season(dt.month) == "Summer":
+        diurnal_amp = 5.5
+    else:
+        diurnal_amp = 4.0
+
+    diurnal = diurnal_amp * math.sin(2.0 * math.pi * (hour - 14.5) / 24.0)
+
+    noise = random.gauss(0.0, 1.8)
+
+    return round(seasonal + diurnal + noise, 1)
+
+
+
+#Load calculation
+
+
+def calculate_load(dt: datetime, temp_c: float) -> float:
+    """
+    Simulated load percentage (25–85%) for a Hoboken-area grid.
+    Strong summer afternoon/evening peak from air conditioning.
+    """
+    hour = dt.hour + dt.minute / 60.0
+    is_weekday = dt.weekday() < 5
+    is_weekend = not is_weekday
+    season = get_season(dt.month)
+    is_summer = season == "Summer"
+    is_winter = season == "Winter"
+
+    #1. Base daily shape
+    if 0.0 <= hour < 5.0:
+        base = 28.0
+    elif 5.0 <= hour < 7.0:
+        base = 28.0 + (hour - 5.0) * 8.0
+    elif 7.0 <= hour < 9.0:
+        base = 44.0 + (hour - 7.0) * 4.0
+    elif 9.0 <= hour < 12.0:
+        base = 52.0
+    elif 12.0 <= hour < 16.0:
+        base = 55.0 + (hour - 12.0) * 1.5
+    elif 16.0 <= hour < 17.0:
+        base = 61.0 + (hour - 16.0) * 6.0
+    elif 17.0 <= hour < 19.0:
+        base = 70.0
+    elif 19.0 <= hour < 21.0:
+        base = 68.0 - (hour - 19.0) * 6.0
+    elif 21.0 <= hour < 23.0:
+        base = 50.0 - (hour - 21.0) * 5.0
+    else:
+        base = 35.0
+
+    #2. Weekend adjustment
+    if is_weekend:
+        if 11.0 <= hour < 19.0:
+            base = max(base, 62.0 + 4.0 * math.sin(math.pi * (hour - 11.0) / 8.0))
+        if hour < 7.0 or hour > 22.0:
+            base *= 0.95
+
+    #3. Seasonal multiplier 
+    if is_summer:
+        base *= 1.22
+        if (is_weekday and 17.0 <= hour < 19.5) or (is_weekend and 12.0 <= hour < 19.5):
+            base = min(base * 1.13, 84.0)
+    elif is_winter:
+        base *= 0.80
+        if hour < 6.0 or hour > 22.0:
+            base *= 0.87
+    else:
+        base *= 0.95
+
+    #4. Temperature influence
+    if temp_c > 25.0:                      # strong cooling demand
+        temp_factor = 1.0 + 0.014 * (temp_c - 25.0)
+    elif temp_c < 5.0:                     # heating + higher indoor activity
+        temp_factor = 1.0 + 0.009 * (5.0 - temp_c)
+    else:
+        temp_factor = 1.0
+
+    load = base * temp_factor
+
+    #5. Noise + hard clamp
+    load += random.uniform(-2.5, 2.5)
+    load = max(25.0, min(85.0, load))
+    return round(load, 1)
+
+#Live CSV writer (newest row always at the top)
+
+def write_live_csv(history: Deque[Tuple[datetime, float, float, str, str]]) -> None:
+    LIVE_CSV_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(LIVE_CSV_FILE, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "Timestamp",
+            "Load_Percent",
+            "Temperature_C",
+            "Season",
+            "Day_Type",
+        ])
+        for ts, load, temp, season, dtype in history:
+            writer.writerow([
+                ts.strftime("%Y-%m-%d %H:%M:%S"),
+                f"{load:.1f}",
+                f"{temp:.1f}",
+                season,
+                dtype,
+            ])
+
+
+def run_live_simulator() -> None:
+    history: Deque[Tuple[datetime, float, float, str, str]] = deque(maxlen=HISTORY_LENGTH)
+
+    print("=" * 60)
+    print("  LIVE GRID LOAD SIMULATOR – Hoboken, NJ")
+    print("=" * 60)
+    print(f"  Writing to      : {LIVE_CSV_FILE}")
+    print(f"  Update interval : every {UPDATE_INTERVAL_SEC} seconds")
+    print(f"  History kept    : last {HISTORY_LENGTH} samples")
+    print("  Press Ctrl+C to stop.")
+    print("=" * 60)
+
+    try:
+        while True:
+            now = datetime.now()
+            temp = simulate_temperature(now)
+            load = calculate_load(now, temp)
+            season = get_season(now.month)
+            dtype = day_type_label(now)
+
+            history.appendleft((now, load, temp, season, dtype))
+            write_live_csv(history)
+
+            print(
+                f"[{now.strftime('%Y-%m-%d %H:%M:%S')}]  "
+                f"Load = {load:5.1f} %   "
+                f"Temp = {temp:5.1f} °C   "
+                f"({season}, {dtype})"
+            )
+            time.sleep(UPDATE_INTERVAL_SEC)
+
+    except KeyboardInterrupt:
+        print("\n\n Data stopped by user.")
+        print(f"Final data saved in:\n  {LIVE_CSV_FILE}")
+
+#Run
+
+if __name__ == "__main__":
+    run_live_simulator()

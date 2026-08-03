@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+*.pkl
+
+data/generated/*
+!data/generated/.gitkeep
