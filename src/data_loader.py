@@ -3,6 +3,7 @@ Module responsible for loading, cleaning and merginf all project datasets:
 -Grid load data
 -Weather Data
 -Electrical outages
+Module name: data_loader.py
 """
 import pandas as pd
 from datetime import datetime
