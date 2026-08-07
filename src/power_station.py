@@ -1,6 +1,6 @@
 """
-power_station.py
 Represents a Hudson County power station with load history and capacity.
+Module name: power_station.py
 """
 class PowerStation:
     def __init__(self, name: str, latitude: float, longitude: float, rated_capacity: float):
