@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from data_loader import DataLoader
 from power_station import PowerStation
 from load_forecaster import LoadForecaster
@@ -5,10 +7,12 @@ from outage_analyzer import OutageAnalyzer
 from risk_model import RiskModel
 
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
 loader = DataLoader(
-    "live_grid_load.csv",
-    "Weather data for Hudson station.csv",
-    "Project electrical outages data.csv"
+    PROJECT_ROOT / "live_grid_load.csv",
+    PROJECT_ROOT / "data" / "raw" / "weather_hudson_station.csv",
+    PROJECT_ROOT / "data" / "raw" / "project_electrical_outages.csv"
 )
 
 merged = loader.merge_all()
