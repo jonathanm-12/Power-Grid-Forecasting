@@ -4,7 +4,7 @@
 
 ## Project overview
 
-Electric grids must continuously balance supply and demand. Unexpected demand, equipment limitations, and weather-driven changes can increase congestion and the likelihood of service interruptions. This project will combine historical electricity, outage, and weather records to forecast short-term grid load and estimate outage risk.
+Electric grids must continuously balance supply and demand. Unexpected demand, equipment limitations, and weather-driven changes can increase congestion and the likelihood of service interruptions. 
 
 The initial study area is Hoboken and Hudson County, New Jersey, using nearby New York Harbor weather observations where appropriate. The final workflow is intended to:
 
