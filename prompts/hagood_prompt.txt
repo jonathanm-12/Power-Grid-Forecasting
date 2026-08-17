@@ -4,3 +4,4 @@ if you were going to write a fairly simple python program to predict power outag
 3) Current time and date. 
 4) Forecast temperature, precipitation and wind out to ten days 
 5) Current and past load on the grid with time and date stamps.
+asldoifcjaposdifjpoaisdjf
