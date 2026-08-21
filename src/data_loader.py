@@ -8,12 +8,22 @@ Module name: data_loader.py
 import pandas as pd
 from datetime import datetime
 import numpy as np
+import os
 
 class DataLoader:
   """
   Handles reading CSV files, cleaning raw values, and merging datasets.
   """
   def __init__(self, grid_path: str, weather_path: str, outage_path: str):
+        # return Exception if path doesnt exist
+        if not os.path.exists(grid_path):
+            raise FileNotFoundError(f"Grid data file not found: {grid_path}")
+        if not os.path.exists(weather_path):
+            raise FileNotFoundError(f"Weather data file not found: {weather_path}")
+        if not os.path.exists(outage_path):
+            raise FileNotFoundError(f"Outage data file not found: {outage_path}")   
+            raise FileNotFoundError(f"Weather data file not found: {weather_path}")    
+
         self.grid_path = grid_path
         self.weather_path = weather_path
         self.outage_path = outage_path
