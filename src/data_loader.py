@@ -21,8 +21,7 @@ class DataLoader:
         if not os.path.exists(weather_path):
             raise FileNotFoundError(f"Weather data file not found: {weather_path}")
         if not os.path.exists(outage_path):
-            raise FileNotFoundError(f"Outage data file not found: {outage_path}")   
-            raise FileNotFoundError(f"Weather data file not found: {weather_path}")    
+            raise FileNotFoundError(f"Outage data file not found: {outage_path}")      
 
         self.grid_path = grid_path
         self.weather_path = weather_path
