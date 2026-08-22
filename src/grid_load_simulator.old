@@ -189,7 +189,7 @@ def run_live_simulator() -> None:
 
     try:
         while True:
-            now = datetime.now().replace(year=2023, month=7, day=15)
+            now = datetime.now()
             temp = simulate_temperature(now)
             load = calculate_load(now, temp)
             season = get_season(now.month)
