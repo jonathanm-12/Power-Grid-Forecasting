@@ -11,7 +11,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 loader = DataLoader(
     PROJECT_ROOT / "live_grid_load.csv",
-    PROJECT_ROOT / "data" / "raw" / "weather_hudson_station.csv",
+    PROJECT_ROOT / "data" / "raw" / "Weather data for Hudson station.csv",
     PROJECT_ROOT / "data" / "raw" / "project_electrical_outages.csv"
 )
 
