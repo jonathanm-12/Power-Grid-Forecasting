@@ -188,17 +188,21 @@ The included outage dataset contains historical outage information for Hudson Co
 
 `GridLoadSimulator.py` generates a synthetic live dataset so the rest of the program can operate on a consistent stream of load observations. The generated file is `live_grid_load.csv`.
 
-## **Data Sources**
+## **Data Sources Investigated**
 
-The project proposal identifies U.S. Department of Energy and U.S. Department of Commerce agencies as the authoritative sources for real-world energy and weather data:
+- U.S. Energy Information Administration (EIA) Hourly Electric Grid Monitor
 
-- [U.S. Energy Information Administration (EIA)](https://www.eia.gov/about/) — the proposal's source for power-usage and energy-utility trend data. EIA is part of the U.S. Department of Energy.
+- U.S. Department of Energy / Data.gov outage datasets
 
-- [National Oceanic and Atmospheric Administration (NOAA)](https://www.noaa.gov/) — the proposal's source for temperature and historical weather data. NOAA is part of the U.S. Department of Commerce.
+- NOAA Integrated Surface Database
 
-- [National Weather Service (NWS)](https://www.weather.gov/nws/about) — identified in the proposal as a possible additional weather source. NWS is part of NOAA.
+- NOAA Global Historical Climatology Network Hourly
 
-The historical weather CSV included in this repository contains NOAA station observations from The Battery, New York. The current grid-load CSV is generated synthetically by `GridLoadSimulator.py`; it is not EIA or utility-company data. The proposal names EIA as the intended source for future real-world load data, but that feed has not yet been integrated.
+- NOAA Storm Events Database
+
+- U.S. Census TIGER/Line geographic boundaries
+
+The Census geographic dataset was investigated as a possible basis for a selectable or color-coded regional outage-risk map.
 
 ## **Requirements**
 
