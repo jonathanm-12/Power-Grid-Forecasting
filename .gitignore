@@ -1,6 +1,10 @@
 __pycache__/
 *.py[cod]
 *.pkl
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
 
 data/generated/*
 !data/generated/.gitkeep
