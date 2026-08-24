@@ -188,13 +188,15 @@ The included outage dataset contains historical outage information for Hudson Co
 
 `GridLoadSimulator.py` generates a synthetic live dataset so the rest of the program can operate on a consistent stream of load observations. The generated file is `live_grid_load.csv`.
 
-## **Data Sources Investigated**
+## **Data Sources**
+
+- [Event-Correlated Outage Dataset in America](https://catalog.data.gov/dataset/event-correlated-outage-dataset-in-america) — historical electrical outage data published through Data.gov
+
+- [NOAA Integrated Surface Database](https://www.ncei.noaa.gov/products/land-based-station/integrated-surface-database) — global hourly weather observations from land-based stations
+
+### **Additional Sources Investigated**
 
 - U.S. Energy Information Administration (EIA) Hourly Electric Grid Monitor
-
-- U.S. Department of Energy / Data.gov outage datasets
-
-- NOAA Integrated Surface Database
 
 - NOAA Global Historical Climatology Network Hourly
 

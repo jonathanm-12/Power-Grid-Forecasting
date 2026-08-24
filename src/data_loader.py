@@ -10,6 +10,8 @@ from datetime import datetime
 import numpy as np
 import os
 
+from utils import runtime_logger
+
 class DataLoader:
   """
   Handles reading CSV files, cleaning raw values, and merging datasets.
@@ -28,6 +30,7 @@ class DataLoader:
         self.outage_path = outage_path
   
   # Grid Load
+  @runtime_logger
   def load_grid_data(self):
     """
     Load the simulated grid data.
@@ -53,6 +56,7 @@ class DataLoader:
                 return np.nan
         return np.nan
 
+  @runtime_logger
   def load_weather_data(self) -> pd.DataFrame:
         """
         Load weather data and convert key fields.
@@ -82,6 +86,7 @@ class DataLoader:
         return df[['DATE', 'temperature_C', 'dewpoint_C', 'pressure_hPa']]
 
   # Electrical Outage Data
+  @runtime_logger
   def load_outage_data(self):
     """
     Load historic electrical outage data for Hudson County.
@@ -92,6 +97,7 @@ class DataLoader:
     return df
     
   # Merging  
+  @runtime_logger
   def merge_all(self):
     """
     Merge grid, weather and outage data.
