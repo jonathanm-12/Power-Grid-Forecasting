@@ -3,7 +3,7 @@ import pytest
 import numpy as np
 import pytest
 
-from src.outage_analyzer import OutageAnalyzer
+from outage_analyzer import OutageAnalyzer
 
 class TestOutageAnalyzer:
     """
@@ -46,6 +46,21 @@ class TestOutageAnalyzer:
         """
         Clean up after tests
         """
+
+    def test_unique_outage_days(self):
+        """Test that repeated events on a date count as one outage day."""
+        outage_days = self.outage_analyzer.unique_outage_days()
+
+        assert isinstance(outage_days, set)
+        assert len(outage_days) == 5
+        assert pd.Timestamp("2026-10-02").date() in outage_days
+
+    def test_string_and_length_overloads(self):
+        """Test the readable summary and outage-event count."""
+        assert len(self.outage_analyzer) == 16
+        assert str(self.outage_analyzer) == (
+            "16 outage events across 5 affected days"
+        )
 
     def test_compute_outage_probability(self):
         """
@@ -101,7 +116,5 @@ class TestOutageAnalyzer:
         # try a window size of the last 2 days from Oct 1, 2026.
         recent_outages = self.outage_analyzer.recent_outages(pd.Timestamp("2026-10-03 0:00"), 48)
         assert len(recent_outages) == 4
-
-
 
 

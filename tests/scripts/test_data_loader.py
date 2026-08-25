@@ -16,9 +16,9 @@ class TestDataLoader:
         """
 
         # use existing paths from the data directory
-        grid_file = "data/generated/live_grid_load.csv"
-        weather_file = "data/raw/Weather data for Hudson station.csv"
-        outages_file = "data/raw/project_electrical_outages.csv"
+        grid_file = "../data/generated/live_grid_load.csv"
+        weather_file = "../data/raw/Weather data for Hudson station.csv"
+        outages_file = "../data/raw/project_electrical_outages.csv"
 
         self.data_loader = DataLoader(grid_file, weather_file, outages_file)
 

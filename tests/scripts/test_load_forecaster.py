@@ -1,8 +1,8 @@
 import pandas as pd
 import pytest
 
-from src.load_forecaster import LoadForecaster
-from src.data_loader import DataLoader
+from load_forecaster import LoadForecaster
+from data_loader import DataLoader
 
 class TestLoadForecaster:
     """Test class for LoadForecaster."""

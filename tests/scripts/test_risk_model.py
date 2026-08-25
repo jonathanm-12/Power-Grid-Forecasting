@@ -4,6 +4,7 @@ import pytest
 import numpy as np
 
 from src.risk_model import RiskModel
+from src.power_station import PowerStation
 
 class TestRiskModel:
     """
@@ -15,7 +16,13 @@ class TestRiskModel:
         Initialize the tests for DataLoader class
         """
 
-        self.risk_model = RiskModel(85)
+        self.station = PowerStation(
+            "Test Station",
+            latitude=40.728,
+            longitude=-74.078,
+            rated_capacity=85,
+        )
+        self.risk_model = RiskModel(self.station)
 
 
     def teardown_method(self):
@@ -23,12 +30,16 @@ class TestRiskModel:
         Clean up after tests
         """
 
+    def test_uses_power_station_composition(self):
+        """Verify that RiskModel retains its PowerStation instance."""
+        assert self.risk_model.station is self.station
+
 
     def test_compute_risk_score(self):
         """
         Test compute_risk_score with several combinations.
         """
-        capacity = self.risk_model.capacity
+        capacity = self.station.rated_capacity
 
         # Typical operating conditions
         score = self.risk_model.compute_risk_score(

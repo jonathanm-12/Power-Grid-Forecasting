@@ -11,8 +11,23 @@ class OutageAnalyzer:
         self.outages['hour'] = self.outages['start_time'].dt.hour
         self.outages['month'] = self.outages['start_time'].dt.month
 
+    def __str__(self):
+        """Return a readable summary of the outage history."""
+        return (
+            f"{len(self):,} outage events across "
+            f"{len(self.unique_outage_days()):,} affected days"
+        )
+
+    def __len__(self):
+        """Return the number of outage events."""
+        return len(self.outages)
+
     def outages_by_season(self):
         return self.outages.groupby('month').size()
+
+    def unique_outage_days(self):
+        """Return the unique dates containing one or more outages."""
+        return set(self.outages['start_time'].dt.date)
 
     def compute_outage_probability(self, timestamp):
         """

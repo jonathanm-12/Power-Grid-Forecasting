@@ -6,25 +6,25 @@
 
 Electric power grids must continuously balance electricity supply and demand. Changes in electricity usage, extreme weather, equipment limitations, and other conditions can place additional stress on the grid and increase the possibility of service interruptions.
 
-This project develops a Python-based Power Grid Load Forecasting and Outage Risk Analyzer focused on the Hoboken and Hudson County, New Jersey area. The program combines electrical load, historical outage, and weather information to explore relationships between grid demand and outage risk.
+This project develops a Python-based Power Grid Load Forecasting and Outage Risk Analyzer focused on the Hudson County, New Jersey area. The program combines electrical load, historical outage, and weather information to explore relationships between grid demand and outage risk.
 
 The project currently includes tools to:
 
-- simulate live electrical grid load for the Hoboken area;
+- Simulate live electrical grid load for the Hoboken area.
 
-- load and clean weather, outage, and grid-load datasets;
+- Load and clean weather, outage, and grid-load datasets.
 
-- merge time-based observations from multiple datasets;
+- Merge time-based observations from multiple datasets.
 
-- calculate short-term electrical-load forecasts;
+- Calculate short-term electrical-load forecasts.
 
-- examine historical outage patterns;
+- Examine historical outage patterns.
 
-- estimate an outage-risk score;
+- Estimate an outage-risk score.
 
-- classify estimated risk into meaningful categories; and
+- Classify estimated risk into meaningful categories.
 
-- provide reusable Python classes and utility functions for analysis.
+- Provide reusable Python classes and utility functions for analysis.
 
 This project was developed for the AAI/CPE/EE 551 course at Stevens Institute of Technology.
 
@@ -42,9 +42,9 @@ Complete this section before the final submission with each team member's primar
 
 |**Team Member**|**Main Contributions**|
 |---|---|
-|Larry Hagood|TODO: Add completed modules, analyses, testing,<br>and documentation contributions.|
-|Jonathan Mikalov|TODO: Add completed modules, analyses, testing,<br>and documentation contributions.|
-|Daniela Montoya|TODO: Add completed modules, analyses, testing,<br>and documentation contributions.|
+|Larry Hagood| Processed CSV datasets, integrated analysis workflow, generated grid load simulator. |
+|Jonathan Mikalov| Established a framework for unit tests and focused on repo cleanup and readability.|
+|Daniela Montoya| Developed risk model and forecasting architecture.|
 
 ## **Project Design**
 
@@ -73,106 +73,6 @@ Simulated Grid Load ─────────┘              |
 
 The current implementation uses a combination of object-oriented programming, data processing, simulation, forecasting, generators, conditionals, loops, and file input/output.
 
-## **Project Components**
-
-### **Grid Load Simulator**
-
-`GridLoadSimulator.py` simulates live electrical demand for the Hoboken, New Jersey area. Rather than requiring access to a utility company's real-time operational grid, the simulator creates synthetic load and temperature observations based on time of day, weekday versus weekend, season, simulated outdoor temperature, and small random variations.
-
-Simulated grid load is limited to approximately 25% to 85%. Weekday demand rises during the morning and generally reaches its highest level during the late afternoon and early evening. Weekend behavior is adjusted to produce a broader daytime demand period. Summer demand is increased to approximate additional air-conditioning use, while winter demand is generally reduced.
-
-The simulator produces a new observation every 10 seconds with the following columns:
-
-```text
-Timestamp Load_Percent Temperature_C Season Day_Type
-```
-
-The observations are written to `live_grid_load.csv`. The newest observation is stored first. The simulator retains up to 1,000 readings, representing approximately 2.8 hours of simulated history at the current update interval. Press `Ctrl+C` to stop it cleanly.
-
-##### **Important: Grid-load and temperature values produced by this module are synthetic. They should not be interpreted as real measurements from the Hoboken electrical grid.**
-
-### **Data Loader**
-
-`data_loader.py` contains the `DataLoader` class and is responsible for bringing the project's datasets into a common form for analysis. It accepts paths to grid-load data, weather data, and electrical-outage data.
-
-#### **Grid Data**
-
-Grid-load timestamps are converted into pandas datetime values. Records containing invalid timestamps are removed before further processing.
-
-#### **Weather Data**
-
-The weather dataset contains NOAA-style fields that require additional processing. The loader parses selected measurements including temperature, dew point, and sea-level pressure. Encoded or missing NOAA values are converted into values that can be handled during analysis.
-
-#### **Outage Data**
-
-Historical electrical-outage records are loaded from CSV and their outage start times are converted into datetime values.
-
-#### **Dataset Merging**
-
-The `merge_all()` method combines grid-load and weather observations using their timestamps. Historical outage information is then associated with the resulting data so that load, weather, and outage characteristics can be examined together.
-
-### **Power Station**
-
-`power_station.py` defines the `PowerStation` class. A station stores its name, latitude, longitude, rated capacity, and historical load values. The class can calculate average and peak load.
-
-- `__str__()` provides a readable description of the station.
-
-- `__lt__()` allows two `PowerStation` objects to be compared according to rated capacity.
-
-### **Load Forecaster**
-
-`load_forecaster.py` contains the `LoadForecaster` class, which performs basic short-term electrical-load forecasting.
-
-#### **Next-Hour Forecast**
-
-The next-hour forecast is calculated using the mean of the most recent load observations.
-
-#### **24-Hour Forecast**
-
-For longer forecasts, historical observations are grouped according to hour of day. The mean historical load for each hour is then used to construct a 24-hour load profile. This is a straightforward educational baseline rather than a production utility-demand forecasting model.
-
-### **Outage Analyzer**
-
-`outage_analyzer.py` defines the `OutageAnalyzer` class. It examines historical outage records and creates time-based information such as outage hour and month.
-
-- counting outages according to month;
-
-- calculating a simple historical outage probability for a particular hour; and
-
-- retrieving outages that occurred within a specified number of hours before a timestamp.
-
-The current probability calculation is intentionally simple: it calculates the fraction of historical outages occurring during the same hour of day as the requested timestamp.
-
-### **Risk Model**
-
-`risk_model.py` contains the `RiskModel` class. The model combines forecast electrical load, historical outage probability, and temperature.
-
-```text
-Risk = 60% load factor + 25% outage probability + 15% temperature factor
-```
-
-|**Risk Score**|**Classification**|
-|---|---|
-|Less than 0.30|Low|
-|0.30 to less than 0.60|Moderate|
-|0.60 to less than 0.85|High|
-|0.85 or greater|Critical|
-
-These thresholds are part of the project's current educational model and should not be interpreted as official utility-industry outage thresholds.
-
-### **Utility Functions**
-
-#### **Runtime Logger**
-
-`runtime_logger` is a decorator that measures how long a decorated function takes to execute.
-
-#### **Hourly Load Generator**
-
-`hourly_load_generator()` is a Python generator that yields grid-load records individually rather than returning another complete copy of the dataset.
-
-#### **Unique Outage Days**
-
-`unique_outage_days()` uses a Python set to obtain the unique dates represented in the historical outage dataset.
 
 ## **Data**
 
@@ -204,31 +104,6 @@ The included outage dataset contains historical outage information for Hudson Co
 
 - U.S. Census TIGER/Line geographic boundaries
 
-The Census geographic dataset was investigated as a possible basis for a selectable or color-coded regional outage-risk map.
-
-## **Requirements**
-
-### **Python**
-
-The project is intended for a modern Python 3 environment. Python 3.12 is the recommended baseline unless the team selects and documents another course-supported version.
-
-### **Python Packages**
-
-Current integrated-project dependencies include:
-
-- pandas
-
-- numpy
-
-Development and final-project components may also use:
-
-- jupyter
-
-- ipykernel
-
-- matplotlib
-
-- pytest
 
 ## **Installation**
 
@@ -257,6 +132,14 @@ python -m pip install -r requirements.txt
 ```
 
 ## **Running the Project**
+
+### **Run the Complete Analysis**
+
+```bash
+jupyter notebook src/main.ipynb
+```
+
+Open `main.ipynb` and select **Run All**. The notebook imports the project modules, loads the included datasets, calculates the next-hour forecast and outage risk, and displays the results and visualizations.
 
 ### **1. Start the Grid Load Simulator**
 
@@ -313,8 +196,12 @@ outage_probability = analyzer.compute_outage_probability(
 
 ```python
 from risk_model import RiskModel
+from power_station import PowerStation
 
-risk_model = RiskModel(station_capacity=85)
+station = PowerStation(
+    "Hudson Substation", 40.728, -74.078, rated_capacity=85
+)
+risk_model = RiskModel(station)
 risk_score = risk_model.compute_risk_score(
     forecast_hour, outage_probability, merged["temperature_C"].iloc[-1]
 )
@@ -335,154 +222,73 @@ Because grid-load simulation includes random variation, results will not necessa
 
 ## **Course Requirement Traceability**
 
+### **Python**
+
+The project is intended for a modern Python 3 environment. Python 3.12 is the recommended baseline.
+
 ### **Part 1**
 
-|**Requirement**|**Current Project Evidence**|
-|---|---|
-|Two meaningful related classes|Multiple project classes including `DataLoader`,<br>`PowerStation`, `LoadForecaster`, `OutageAnalyzer`, and<br>`RiskModel`|
-|Meaningful functions|Data loading, simulation, forecasting, outage<br>analysis, and risk calculations|
-|Advanced libraries|pandas and NumPy|
-|Exception scenarios / pytest|TODO: Complete and document final pytest cases|
-|Data input/output|Multiple CSV files are read; the simulator writes<br>`live_grid_load.csv`|
-|Loops and conditionals|Grid simulation, dataset processing, forecasting,<br>season/time/load logic, and risk classification|
-|Mutable and immutable types|Lists, sets, DataFrames, tuples, strings, and<br>numerical values|
-|Operator overloading|`PowerStation.__str__()` and `PowerStation.__lt__()`|
-|Documentation|Modules and major functions/classes include<br>documentation; perform final review|
-|Main-module behavior|`GridLoadSimulator.py` uses `if __name__ ==`<br>`'__main__':`|
+|**#**|**Requirement**|**Current Project Evidence**|
+|---:|---|---|
+|1|Two meaningful related classes|`RiskModel` is composed with a `PowerStation`: its constructor stores the station instance and uses the station's rated capacity when calculating risk. Both classes have constructors, attributes, methods, and instances in `main.ipynb`. This relationship currently depends on retaining `PowerStation`.|
+|2|Two meaningful functions|`plot_load_over_time()`, `plot_outages_by_month()`, and `plot_risk_over_time()` directly communicate load, outage, and risk results. They currently reside in `main.ipynb`; move them to a `.py` visualization module if the course requires every helper function to be imported by the notebook.|
+|3|Two advanced libraries|Pandas performs CSV loading, datetime processing, grouping, and dataset merging; NumPy represents missing numeric values; Matplotlib produces the three project visualizations.|
+|4|Two exception scenarios and Pytest tests|`DataLoader` raises `FileNotFoundError` for missing inputs, while `_parse_noaa_numeric()` handles malformed NOAA values by returning `np.nan`. The verified suite contains 16 passing tests.|
+|5|Meaningful data I/O|`DataLoader` reads grid-load, weather, and electrical-outage CSV files and converts them into analysis-ready DataFrames.|
+|6|Two loops and two conditionals|`DataLoader.merge_all()` uses a `for` loop and a `while` loop. File validation, NOAA parsing, outage probability, and risk classification provide multiple `if` statements.|
+|7|Mutable and immutable types|Forecast values use a mutable list and unique outage dates use a mutable set. File paths and labels use immutable strings, while capacities, probabilities, and risk scores use immutable numbers.|
+|8|`__str__()` and another overload|`OutageAnalyzer.__str__()` returns a readable outage summary and `OutageAnalyzer.__len__()` returns the event count. `PowerStation` additionally defines `__str__()` and `__lt__()`.|
+|9|Docstrings, headers, and comments|Modules contain descriptive headers and many functions have docstrings and comments, but class or constructor docstrings are still missing from `LoadForecaster`, `OutageAnalyzer`, and `DataLoader.__init__()`.|
+|10|`__name__` behavior|`main.ipynb` remains the main program and uses `if __name__ == "__main__":` before displaying its visualizations.|
 
 ### **Part 2**
 
+The project currently demonstrates four of the selectable Python features:
+
 |**Component**|**Current Project Evidence**|
 |---|---|
-|Comprehension|List comprehensions are used when constructing<br>project data|
-|Built-in module/library|`csv`, `math`, `random`, `datetime`, `pathlib`, `collections`,<br>`time`, and `functools` are represented across project<br>modules|
-|Generator|`hourly_load_generator()` yields individual load<br>records|
-|Special function|TODO: Verify final `map()`, `zip()`, `filter()`, `lambda`, or<br>`reduce()` implementation before submission|
+|List comprehension|`LoadForecaster.forecast_next_24h()` constructs its 24-hour forecast with a list comprehension.|
+|Built-in module/library|`DataLoader` uses the standard-library `os` module to validate input paths before loading data.|
+|Set operation|`OutageAnalyzer.unique_outage_days()` creates a set of distinct dates containing outages.|
+|Linear data structure|The 24-hour forecast and station load history use Python lists, which are dynamic-array linear data structures.|
 
 ## **Testing**
 
-Formal pytest coverage should be completed before final submission. Useful tests include:
+The repository currently contains 16 passing Pytest tests:
 
-- valid grid-load data;
+|**Test Area**|**Tests**|**Coverage**|
+|---|---:|---|
+|`DataLoader`|6|Path validation, grid loading, NOAA parsing, weather loading, outage loading, and merged-data integrity.|
+|`LoadForecaster`|3|Feature preparation, next-hour forecasting, and the 24-hour forecast profile.|
+|`OutageAnalyzer`|4|Unique outage days, `__str__()` and `__len__()`, hourly outage probability, and recent-outage windows.|
+|`RiskModel`|3|Composition with `PowerStation`, weighted risk-score calculations, and all four classification levels.|
+|**Total**|**16**|All tests pass in the current environment.|
 
-- malformed or missing timestamps;
-
-- missing CSV files;
-
-- NOAA missing-value handling;
-
-- weather-value parsing;
-
-- empty station load history;
-
-- average and peak station load calculations;
-
-- forecast output;
-
-- empty outage datasets;
-
-- outage-probability calculations;
-
-- risk-score calculations; and
-
-- boundaries between Low, Moderate, High, and Critical classifications.
+Run the complete suite from the repository's `src` directory so the dataset paths used by the tests resolve correctly:
 
 ```bash
-python -m pytest -v
+cd src
+python -m pytest -v ../tests/scripts
 ```
-
-## **Current Limitations**
-
-- Grid-load observations generated by `GridLoadSimulator.py` are synthetic.
-
-- The simulator does not connect to a live utility power grid.
-
-- The weather station used in the historical dataset is near Hudson County but is not physically located in Hoboken.
-
-- Historical correlation between weather, load, and outage events does not demonstrate causation.
-
-- The current forecasting methods are baseline statistical forecasts rather than trained utility forecasting models.
-
-- The outage probability model uses historical hour-of-day frequency and does not by itself predict whether an individual outage will occur.
-
-- The risk formula and classification thresholds are project-defined educational values rather than industry-standard utility thresholds.
-
-- Random variation in the simulator means results may differ between runs.
-
-- Rare outages can create significant class imbalance.
-
-- Results depend strongly on timestamp alignment, geographic compatibility, missing-value treatment, and source-data quality.
-
-The project's forecasts and risk classifications must not be used for emergency planning, infrastructure operation, or real-world utility decisions.
 
 ## **Future Improvements**
 
-- replace simulated grid load with an appropriate real-world regional load feed;
+- Replace simulated grid load with an appropriate real-world regional load feed.
 
-- incorporate weather forecasts for future risk estimation;
+- Incorporate weather forecasts for future risk estimation.
 
-- develop more advanced machine-learning forecasting models;
+- Develop more advanced machine-learning forecasting models.
 
-- evaluate model accuracy against held-out historical data;
+- Evaluate model accuracy against held-out historical data.
 
-- add additional weather variables and severe-weather information;
+- Add additional weather variables and severe-weather information.
 
-- improve temporal matching between outage and weather observations;
+- Improve temporal matching between outage and weather observations.
 
-- account for outage duration and number of affected customers;
+- Account for outage duration and number of affected customers.
 
-- create visual load and outage-risk plots;
+- Develop an interactive county or regional risk map.
 
-- develop an interactive county or regional risk map;
+- Support additional locations outside Hudson County.
 
-- support additional locations outside Hudson County; and
-
-- create a user interface for selecting a location and viewing forecasts.
-
-## **Final Submission Checklist**
-
-- [ ] Confirm that all required Python modules are included in the repository.
-
-- [ ] Confirm that all required CSV datasets are included or provide instructions for obtaining them.
-
-- [ ] Create and verify `requirements.txt`.
-
-- [ ] Complete the required `main.ipynb` notebook if applicable.
-
-- [ ] Add and run the required pytest tests.
-
-- [ ] Verify the required special-function implementation.
-
-- [ ] Confirm all modules, classes, and functions meet course documentation requirements.
-
-- [ ] Add each team member's main contributions.
-
-- [ ] Verify setup instructions from a clean environment.
-
-- [ ] Confirm that file paths work from the repository root.
-
-- [ ] Update the repository structure in the README to match the final submission.
-
-- [ ] Document exact dataset sources and preprocessing.
-
-- [ ] Confirm each team member has the required number of meaningful commits.
-
-- [ ] Remove obsolete exploratory files that are not part of the final submission.
-
-- [ ] Review all TODO items.
-
-- [ ] Confirm the final repository complies with course academic-integrity requirements.
-
-## **Academic Integrity**
-
-This project should be submitted in accordance with the course's academic-integrity and AI-use policies. Any exploratory or AI-assisted material retained during development should be reviewed against the instructor's requirements before submission. The final repository should contain only material that the team is permitted to submit and can explain, maintain, and demonstrate.
-
-## **Disclaimer**
-
-This software was created as a college programming project for educational purposes. It is not a utility monitoring, emergency-management, or infrastructure-control system.
-
-Grid-load simulation, outage probability, forecasting, and risk classifications are simplified educational models and should not be interpreted as operational predictions.
-
-## **License**
-
-TODO: Select an appropriate repository license and document any dataset-specific licensing or public-use requirements before final publication.
+- Create a user interface for selecting a location and viewing forecasts.

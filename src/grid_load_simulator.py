@@ -15,6 +15,9 @@ Load ranges from 25% to 85%:
   Highest: 5–7 pm weekdays and 12–7 pm weekends in summer (AC-driven)
   Lowest:  late night in winter
 
+NOTE: grid_load_simulator.py is AI-generated as it is solely used for generating data for live_grid_load.csv. 
+It is not used in the actual forecasting model.
+
 """
 
 from __future__ import annotations
